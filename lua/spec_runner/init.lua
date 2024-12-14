@@ -1,8 +1,20 @@
 
 local spec_runner = {}
 
+local function append_output(buf, output)
+  vim.schedule(function()
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+
+    for line in output:gmatch('([^\r\n]+)') do
+      table.insert(lines, line)
+    end
+
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  end)
+end
+
 local function open_output_buffer()
-  local buf = vim.api.nvim_create_buf(true, true)
+  local buf = vim.api.nvim_create_buf(false, true)
 
   vim.bo[buf].buftype = 'nofile'
 
@@ -24,36 +36,87 @@ local function open_output_buffer()
   return buf, win
 end
 
-local function run_shell_command(cmd, buf)
-  local output = vim.fn.systemlist(cmd)
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'Error: ' .. table.concat(output, '\n') })
-  else
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+local function run_shell_command(buf, command)
+  local pid
+  local stdin = vim.loop.new_pipe(true)
+  local stdout = vim.loop.new_pipe(true)
+  local stderr = vim.loop.new_pipe(true)
+
+  pid, _ = vim.loop.spawn(command.cmd, {
+    args = command.args,
+    env = command.env,
+    stdio = { stdin, stdout, stderr },
+    close_fd = { stdin = true,  stdout = true,  stderr = true }
+  })
+
+  if not pid then
+    append_output(buf, 'Failed...')
+    append_output(buf, 'Command: ' .. command.cmd)
+
+    if command.args then
+      append_output(buf, 'Args: ')
+      for i = 1, #command.args do
+        append_output(buf, '\t' .. command.args[i])
+      end
+    end
+
+    if command.env then
+      append_output(buf, 'Env: ')
+      for i = 1, #command.env do
+        append_output(buf, '\t' .. command.env[i])
+      end
+    end
+
+    return
   end
+
+  vim.loop.read_start(stdout, function(err, data)
+    if err then
+      append_output(buf, 'Erro reading stdout: ' .. err)
+    elseif data then
+      append_output(buf, data)
+    end
+  end)
+
+  vim.loop.read_start(stderr, function(err, data)
+    if err then
+      append_output(buf, 'Error reading stderr: ' .. err)
+    elseif data then
+      append_output(buf, data)
+    end
+  end)
 end
 
 local function get_ruby_spec_command()
+  local command = { cmd = 'rspec' }
   local file = vim.fn.expand('%')
+
   if vim.fn.filereadable(file) == 1 then
-    return 'rspec ' .. file
-  else
-    return "echo 'Open a file first, dumbass'"
+    command.args = { file }
   end
+
+  return command
 end
 
 function spec_runner.run_specs()
   local command
   local filetype = vim.bo.filetype
-  local buf = open_output_buffer()
 
   if filetype == 'ruby' then
     command = get_ruby_spec_command()
   else
-    command = "echo 'Unsupported filetype: " .. filetype .. "'"
+    if filetype == '' then
+      filetype = 'Unknown language!'
+    end
+
+    command = {
+      cmd = 'echo',
+      args = { 'Unsupported filetype: ' .. filetype }
+    }
   end
 
-  run_shell_command(command, buf)
+  local buf = open_output_buffer()
+  run_shell_command(buf, command)
 end
 
 function spec_runner.setup()
