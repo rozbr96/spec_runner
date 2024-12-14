@@ -1,6 +1,10 @@
 
 local spec_runner = {}
 
+local config = {
+  cmd = 'rspec'
+}
+
 local function append_output(buf, output)
   vim.schedule(function()
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
@@ -88,7 +92,7 @@ local function run_shell_command(buf, command)
 end
 
 local function get_ruby_spec_command()
-  local command = { cmd = 'rspec' }
+  local command = { cmd = config.cmd }
   local file = vim.fn.expand('%')
 
   if vim.fn.filereadable(file) == 1 then
@@ -119,7 +123,9 @@ function spec_runner.run_specs()
   run_shell_command(buf, command)
 end
 
-function spec_runner.setup()
+function spec_runner.setup(user_config)
+  config = vim.tbl_deep_extend('force', config, user_config or {})
+
   vim.api.nvim_create_user_command(
     'RunSpecs',
     function()
