@@ -14,6 +14,14 @@ function M.setup(user_config)
     end,
     { desc = 'Run specs for the current project' }
   )
+
+  vim.api.nvim_create_user_command(
+    'RunCurrentSpec',
+    function()
+      commands.run_current_spec()
+    end,
+    { desc = 'Run spec for the current cursor position' }
+  )
 end
 
 return M

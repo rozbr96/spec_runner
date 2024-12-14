@@ -4,10 +4,12 @@ local default_configs = require('spec_runner.defaults')
 
 M = {}
 
-function M.get_ruby_spec_command()
-  local file = vim.fn.expand('%')
-  local ruby_configs = default_configs.config.ruby
-  local full_command = ruby_configs.cmd .. ' ' .. table.concat(ruby_configs.args, ' ')
+M.ruby = require('spec_runner.langs.ruby')
+
+function M.get_spec_command(lang, file, target_spec)
+  file = file or vim.fn.expand('%')
+  local configs = default_configs.config[lang]
+  local full_command = configs.cmd .. ' ' .. table.concat(configs.args, ' ')
   local parts = utils.split(full_command, ' ')
 
   local command = {
@@ -16,7 +18,7 @@ function M.get_ruby_spec_command()
   }
 
   if vim.fn.filereadable(file) == 1 then
-    table.insert(command.args, file)
+    table.insert(command.args, target_spec or file)
   end
 
   return command
