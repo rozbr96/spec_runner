@@ -1,9 +1,12 @@
 
+require('spec_runner.utils')
+
 local spec_runner = {}
 
 local config = {
   ruby = {
-    cmd = 'rspec'
+    cmd = 'rspec',
+    args = {}
   }
 }
 
@@ -94,12 +97,18 @@ local function run_shell_command(buf, command)
 end
 
 local function get_ruby_spec_command()
-  local ruby_configs = config.ruby
-  local command = { cmd = ruby_configs.cmd }
   local file = vim.fn.expand('%')
+  local ruby_configs = config.ruby
+  local full_command = ruby_configs.cmd .. ' ' .. table.concat(ruby_configs.args, ' ')
+  local parts = split(full_command, ' ')
+
+  local command = {
+    cmd = table.remove(parts, 1),
+    args = parts
+  }
 
   if vim.fn.filereadable(file) == 1 then
-    command.args = { file }
+    table.insert(command.args, file)
   end
 
   return command
