@@ -2,7 +2,9 @@
 local spec_runner = {}
 
 local config = {
-  cmd = 'rspec'
+  ruby = {
+    cmd = 'rspec'
+  }
 }
 
 local function append_output(buf, output)
@@ -92,7 +94,8 @@ local function run_shell_command(buf, command)
 end
 
 local function get_ruby_spec_command()
-  local command = { cmd = config.cmd }
+  local ruby_configs = config.ruby
+  local command = { cmd = ruby_configs.cmd }
   local file = vim.fn.expand('%')
 
   if vim.fn.filereadable(file) == 1 then
