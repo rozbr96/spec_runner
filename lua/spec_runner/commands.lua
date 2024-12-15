@@ -1,9 +1,12 @@
 
+local last_command
 local buffer = require('spec_runner.buffer')
 local system = require('spec_runner.system')
 local langs = require('spec_runner.langs')
 
 local function run(command)
+  last_command = command
+
   local buf = buffer.open_output_buffer()
   system.run_shell_command(buf, command)
 end
@@ -49,6 +52,12 @@ function M.run_current_spec()
   end
 
   run(command)
+end
+
+function M.run_last_command()
+  if last_command then
+    run(last_command)
+  end
 end
 
 return M
