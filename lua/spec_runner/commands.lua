@@ -29,8 +29,8 @@ function M.run_specs()
   local command
   local filetype = vim.bo.filetype
 
-  if filetype == 'ruby' then
-    command = langs.get_spec_command('ruby')
+  if langs[filetype] then
+    command = langs.get_spec_command(filetype)
   else
     command = unsupported_lang_command(filetype)
   end
@@ -43,10 +43,10 @@ function M.run_current_spec()
   local file = vim.fn.expand('%')
   local filetype = vim.bo.filetype
 
-  if filetype == 'ruby' then
-    local spec_line = langs.ruby.get_current_cursor_spec_starting_line()
-    local target_spec = langs.ruby.get_target_spec(file, spec_line)
-    command = langs.get_spec_command('ruby', file, target_spec)
+  if langs[filetype] then
+    local spec_line = langs[filetype].get_current_cursor_spec_starting_line()
+    local target_spec = langs[filetype].get_target_spec(file, spec_line)
+    command = langs.get_spec_command(filetype, file, target_spec)
   else
     command = unsupported_lang_command(filetype)
   end
