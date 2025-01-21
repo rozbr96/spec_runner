@@ -17,5 +17,9 @@ function M.starts_with(str, prefix)
   return string.find(str, prefix, 1, true) == 1
 end
 
+function M.contains(str, pattern)
+  return string.find(str, pattern, 1, false) ~= nil
+end
+
 return M
 

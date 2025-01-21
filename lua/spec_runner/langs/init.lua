@@ -5,6 +5,7 @@ local default_configs = require('spec_runner.defaults')
 M = {}
 
 M.ruby = require('spec_runner.langs.ruby')
+M.python = require('spec_runner.langs.python')
 
 function M.get_spec_command(lang, file, target_spec)
   file = file or vim.fn.expand('%')
