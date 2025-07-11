@@ -9,6 +9,10 @@ M.config = {
   python = {
     cmd = 'python',
     args = { '-m', 'unittest', '--verbose' }
+  },
+  elixir = {
+    cmd = 'mix',
+    args = { 'test' }
   }
 }
 

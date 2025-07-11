@@ -6,6 +6,7 @@ M = {}
 
 M.ruby = require('spec_runner.langs.ruby')
 M.python = require('spec_runner.langs.python')
+M.elixir = require('spec_runner.langs.elixir')
 
 function M.get_spec_command(lang, file, target_spec)
   file = file or vim.fn.expand('%')
