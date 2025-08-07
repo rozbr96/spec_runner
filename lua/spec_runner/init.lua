@@ -45,6 +45,14 @@ function M.setup(user_config)
     end,
     { desc = 'Run last spec command' }
   )
+
+  vim.api.nvim_create_user_command(
+    'DisplayLastSpecCommandOuput',
+    function()
+      commands.display_last_output()
+    end,
+    { desc = 'Display last spec command output' }
+  )
 end
 
 return M

@@ -1,4 +1,5 @@
 
+local last_buf
 local last_command
 local buffer = require('spec_runner.buffer')
 local langs = require('spec_runner.langs')
@@ -6,7 +7,7 @@ local langs = require('spec_runner.langs')
 local function run(command)
   last_command = command
 
-  buffer.open_output_buffer()
+  last_buf, _ = buffer.open_output_buffer()
 
   vim.fn.termopen(command.cmd .. " " .. table.concat(command.args or {}, " "))
 end
@@ -57,6 +58,12 @@ end
 function M.run_last_command()
   if last_command then
     run(last_command)
+  end
+end
+
+function M.display_last_output()
+  if last_buf and vim.api.nvim_buf_is_loaded(last_buf) then
+    buffer.open_output_buffer(last_buf)
   end
 end
 

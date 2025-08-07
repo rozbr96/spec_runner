@@ -1,8 +1,8 @@
 
 M = {}
 
-function M.open_output_buffer()
-  local buf = vim.api.nvim_create_buf(false, true)
+function M.open_output_buffer(buf)
+  buf = buf or vim.api.nvim_create_buf(false, true)
 
   local width = math.floor(vim.o.columns * 0.8)
   local height = math.floor(vim.o.lines * 0.8)
