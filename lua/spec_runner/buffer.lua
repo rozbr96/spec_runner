@@ -1,25 +1,11 @@
 
 M = {}
 
-function M.append_output(buf, output)
-  vim.schedule(function()
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-
-    for line in output:gmatch('([^\r\n]+)') do
-      table.insert(lines, line)
-    end
-
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-  end)
-end
-
 function M.open_output_buffer()
   local buf = vim.api.nvim_create_buf(false, true)
 
-  vim.bo[buf].buftype = 'nofile'
-
-  local width = 160
-  local height = 40
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.8)
   local row = math.floor((vim.o.lines - height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
 
@@ -30,7 +16,7 @@ function M.open_output_buffer()
     row = row,
     col = col,
     style = 'minimal',
-    border = 'single'
+    border = 'rounded',
   })
 
   return buf, win
