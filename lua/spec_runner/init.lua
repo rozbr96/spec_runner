@@ -1,4 +1,3 @@
-
 local defaults = require('spec_runner.defaults')
 local commands = require('spec_runner.commands')
 
@@ -47,7 +46,7 @@ function M.setup(user_config)
   )
 
   vim.api.nvim_create_user_command(
-    'DisplayLastSpecCommandOuput',
+    'DisplayLastSpecCommandOutput',
     function()
       commands.display_last_output()
     end,
@@ -56,4 +55,3 @@ function M.setup(user_config)
 end
 
 return M
-
