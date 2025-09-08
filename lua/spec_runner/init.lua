@@ -38,6 +38,14 @@ function M.setup(user_config)
   )
 
   vim.api.nvim_create_user_command(
+    'RunFailedSpecs',
+    function()
+      commands.run_failed_specs()
+    end,
+    { desc = 'Run previous failed specs' }
+  )
+
+  vim.api.nvim_create_user_command(
     'RunLastSpecCommand',
     function()
       commands.run_last_command()

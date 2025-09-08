@@ -1,4 +1,3 @@
-
 local last_buf
 local last_command
 local buffer = require('spec_runner.buffer')
@@ -26,12 +25,17 @@ end
 
 M = {}
 
-function M.run_specs()
+function M.run_specs(only_failed_tests)
   local command
   local filetype = vim.bo.filetype
+  local lang = langs[filetype]
 
-  if langs[filetype] then
+  if lang then
     command = langs.get_spec_command(filetype)
+
+    if only_failed_tests then
+      table.insert(command.args, lang.only_failed_specs_flag)
+    end
   else
     command = unsupported_lang_command(filetype)
   end
@@ -61,6 +65,10 @@ function M.run_last_command()
   end
 end
 
+function M.run_failed_specs()
+  M.run_specs(true)
+end
+
 function M.display_last_output()
   if last_buf and vim.api.nvim_buf_is_loaded(last_buf) then
     buffer.open_output_buffer(last_buf)
@@ -68,4 +76,3 @@ function M.display_last_output()
 end
 
 return M
-
