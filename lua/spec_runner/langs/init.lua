@@ -1,6 +1,6 @@
 
 local utils = require('spec_runner.utils')
-local default_configs = require('spec_runner.defaults')
+local configs = require('spec_runner.configs')
 
 M = {}
 
@@ -10,8 +10,8 @@ M.elixir = require('spec_runner.langs.elixir')
 
 function M.get_spec_command(lang, file, target_spec)
   file = file or vim.fn.expand('%')
-  local configs = default_configs.config[lang]
-  local full_command = configs.cmd .. ' ' .. table.concat(configs.args, ' ')
+  local lang_configs = configs.config[lang]
+  local full_command = lang_configs.cmd .. ' ' .. table.concat(lang_configs.args, ' ')
   local parts = utils.split(full_command, ' ')
 
   local command = {
