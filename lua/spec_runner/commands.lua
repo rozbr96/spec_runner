@@ -26,19 +26,25 @@ end
 
 M = {}
 
-function M.run_specs(only_failed_tests)
+function M.run_specs(only_failed_tests, stop_at_first_failure)
   local command
   local filetype = vim.bo.filetype
   local lang = langs[filetype]
 
   if lang then
+    local lang_configs = configs.config[filetype]
+
     command = langs.get_spec_command(filetype)
 
     if only_failed_tests then
-      local lang_configs = configs.config[filetype]
-
       if lang_configs.failed_specs_flag then
         table.insert(command.args, lang_configs.failed_specs_flag)
+      end
+    end
+
+    if stop_at_first_failure then
+      if lang_configs.stop_at_first_failure_flag then
+        table.insert(command.args, lang_configs.stop_at_first_failure_flag)
       end
     end
   else
@@ -72,6 +78,14 @@ end
 
 function M.run_failed_specs()
   M.run_specs(true)
+end
+
+function M.run_till_first_failure()
+  M.run_specs(false, true)
+end
+
+function M.run_failed_specs_till_first_failure()
+  M.run_specs(true, true)
 end
 
 function M.display_last_output()

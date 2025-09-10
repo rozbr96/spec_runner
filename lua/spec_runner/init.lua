@@ -46,6 +46,22 @@ function M.setup(user_config)
   )
 
   vim.api.nvim_create_user_command(
+    'RunSpecsTillFirstFailure',
+    function()
+      commands.run_till_first_failure()
+    end,
+    { desc = 'Run specs and abort at first failure' }
+  )
+
+  vim.api.nvim_create_user_command(
+    'RunFailedSpecsTillFirstFailure',
+    function()
+      commands.run_failed_specs_till_first_failure()
+    end,
+    { desc = 'Run failed specs and abert at first failure' }
+  )
+
+  vim.api.nvim_create_user_command(
     'RunLastSpecCommand',
     function()
       commands.run_last_command()

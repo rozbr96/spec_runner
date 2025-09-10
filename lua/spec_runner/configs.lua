@@ -12,7 +12,8 @@ M.config = {
   elixir = {
     cmd = 'mix',
     args = { 'test' },
-    failed_specs_flag = '--failed'
+    failed_specs_flag = '--failed',
+    stop_at_first_failure_flag = '--max-failures 1'
   }
 }
 
