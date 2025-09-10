@@ -2,6 +2,7 @@ local last_buf
 local last_command
 local buffer = require('spec_runner.buffer')
 local langs = require('spec_runner.langs')
+local configs = require('spec_runner.configs')
 
 local function run(command)
   last_command = command
@@ -34,7 +35,11 @@ function M.run_specs(only_failed_tests)
     command = langs.get_spec_command(filetype)
 
     if only_failed_tests then
-      table.insert(command.args, lang.only_failed_specs_flag)
+      local lang_configs = configs.config[filetype]
+
+      if lang_configs.failed_specs_flag then
+        table.insert(command.args, lang_configs.failed_specs_flag)
+      end
     end
   else
     command = unsupported_lang_command(filetype)

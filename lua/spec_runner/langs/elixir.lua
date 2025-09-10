@@ -1,8 +1,6 @@
 local Base = require('spec_runner.langs.base')
 
-Elixir = {
-  only_failed_specs_flag = '--failed'
-}
+Elixir = {}
 
 function Elixir.get_current_cursor_spec_starting_line()
   return Base.get_current_cursor_starting_line({ 'describe ', 'test ' })
