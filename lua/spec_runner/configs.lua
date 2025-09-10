@@ -1,4 +1,3 @@
-
 M = {}
 
 M.config = {
@@ -17,4 +16,3 @@ M.config = {
 }
 
 return M
-
