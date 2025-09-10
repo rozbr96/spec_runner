@@ -1,4 +1,4 @@
-local defaults = require('spec_runner.defaults')
+local configs = require('spec_runner.configs')
 local commands = require('spec_runner.commands')
 
 local function get_custom_config()
@@ -19,7 +19,7 @@ local M = {}
 
 function M.setup(user_config)
   local custom_config = get_custom_config()
-  defaults.config = vim.tbl_deep_extend('force', defaults.config, user_config or {}, custom_config)
+  configs.config = vim.tbl_deep_extend('force', configs.config, user_config or {}, custom_config)
 
   vim.api.nvim_create_user_command(
     'RunSpecs',
