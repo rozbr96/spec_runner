@@ -9,6 +9,8 @@ local BaseRunner = {}
 ---@class Runner.Command
 ---@field cmd string
 ---@field args string[]
+---@field failed_specs_flag string?
+---@field stop_at_first_failure_flag string?
 
 ---The language code definition
 ---@type string

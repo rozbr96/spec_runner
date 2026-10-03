@@ -1,5 +1,6 @@
 M = {}
 
+---@type table<string, Runner.Command>
 M.config = {
   ruby = {
     cmd = 'rspec',
