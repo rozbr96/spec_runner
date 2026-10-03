@@ -1,7 +1,12 @@
-
+local BaseRunner = require('spec_runner.langs.base')
 local utils = require('spec_runner.utils')
 
-Python = {}
+---@class PythonRunner: Runner
+local Python = setmetatable({
+  lang = 'python'
+}, {
+  __index = BaseRunner
+})
 
 local function token_name(line, token_type)
   local token = table.remove(utils.split(line, token_type), 2)
@@ -10,7 +15,7 @@ local function token_name(line, token_type)
   return token
 end
 
-function Python.get_current_cursor_spec_starting_line()
+function Python:get_current_cursor_spec_starting_line()
   local buf = vim.api.nvim_get_current_buf()
   local win = vim.api.nvim_get_current_win()
   local cursor = vim.api.nvim_win_get_cursor(win)
@@ -31,9 +36,9 @@ function Python.get_current_cursor_spec_starting_line()
     end
 
     if utils.starts_with(stripped_line, 'def test_') or (
-      utils.starts_with(stripped_line, 'class ')
-        and utils.contains(stripped_line, 'Test')
-    ) then
+          utils.starts_with(stripped_line, 'class ')
+          and utils.contains(stripped_line, 'Test')
+        ) then
       local current_line_tab_index = string.find(line, '%S')
 
       if current_line_tab_index < first_code_line_tab_index then
@@ -67,9 +72,8 @@ function Python.get_current_cursor_spec_starting_line()
   return target
 end
 
-function Python.get_target_spec(_, target_spec)
+function Python:get_target_spec(_, target_spec)
   return target_spec
 end
 
 return Python
-

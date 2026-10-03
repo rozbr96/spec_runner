@@ -34,7 +34,7 @@ function M.run_specs(only_failed_tests, stop_at_first_failure)
   if lang then
     local lang_configs = configs.config[filetype]
 
-    command = langs.get_spec_command(filetype)
+    command = lang:get_spec_command()
 
     if only_failed_tests then
       if lang_configs.failed_specs_flag then
@@ -60,9 +60,9 @@ function M.run_current_spec()
   local filetype = vim.bo.filetype
 
   if langs[filetype] then
-    local spec_line = langs[filetype].get_current_cursor_spec_starting_line()
-    local target_spec = langs[filetype].get_target_spec(file, spec_line)
-    command = langs.get_spec_command(filetype, file, target_spec)
+    local spec_line = langs[filetype]:get_current_cursor_spec_starting_line()
+    local target_spec = langs[filetype]:get_target_spec(file, spec_line)
+    command = langs[filetype]:get_spec_command(file, target_spec)
   else
     command = unsupported_lang_command(filetype)
   end

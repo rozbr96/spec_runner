@@ -1,15 +1,30 @@
 local utils = require('spec_runner.utils')
+local configs = require('spec_runner.configs')
 
 ---BaseRunner spec runner
 ---@class Runner
 local BaseRunner = {}
 
+---BaseRunner spec command
+---@class Runner.Command
+---@field cmd string
+---@field args string[]
+
+---The language code definition
+---@type string
+BaseRunner.lang = nil
+
+---The block spec starters for the runner
+---
+---Starting line contents which represent spec blocks, like "`RSpec.describe`" or "`def test_`"
+---@type string[]
+BaseRunner.test_block_starters = {}
+
 ---Returns the starting line number for the current spec block
 ---
 ---If the cursor current position is not within a spec block, then first line reference is returned
----@param test_block_starters string[] The prefix indications which represent spec blocks, like "`RSpec.describe`" or "`def test_`"
 ---@return number
-function BaseRunner.get_current_cursor_starting_line(test_block_starters)
+function BaseRunner:get_current_cursor_spec_starting_line()
   local buffer = vim.api.nvim_get_current_buf()
   local window = vim.api.nvim_get_current_win()
   local cursor = vim.api.nvim_win_get_cursor(window)
@@ -27,8 +42,8 @@ function BaseRunner.get_current_cursor_starting_line(test_block_starters)
       first_code_line_tab_index = first_code_line_tab_index + (is_first_line and 1 or 0)
     end
 
-    for index = 1, #test_block_starters do
-      if utils.starts_with(stripped_line_content, test_block_starters[index]) then
+    for index = 1, #self.test_block_starters do
+      if utils.starts_with(stripped_line_content, self.test_block_starters[index]) then
         local current_line_tab_index = string.find(line_content, '%S')
 
         if current_line_tab_index < first_code_line_tab_index then
@@ -44,6 +59,31 @@ function BaseRunner.get_current_cursor_starting_line(test_block_starters)
   return 1
 end
 
+---Retrieves the spec command for the runner
+---
+---@param file string? The filename which spec is about to run
+---@param target_spec string? The target spec which is about to run
+---@return Runner.Command
+function BaseRunner:get_spec_command(file, target_spec)
+  file = file or vim.fn.expand('%')
+
+  local lang_configs = configs.config[self.lang]
+  local full_command = lang_configs.cmd .. ' ' .. table.concat(lang_configs.args, ' ')
+  local parts = utils.split(full_command, ' ')
+
+  ---@type Runner.Command
+  local command = {
+    cmd = table.remove(parts, 1),
+    args = parts
+  }
+
+  if vim.fn.filereadable(file) == 1 then
+    table.insert(command.args, target_spec or file)
+  end
+
+  return command
+end
+
 ---MUST BE IMPLEMENTED BY THE RUNNER
 ---
 ---Builds the full targetted spec identification, along with path and line number
@@ -51,7 +91,7 @@ end
 ---@param filename string The targeted spec file
 ---@param line string | number The targeted spec line number
 ---@return string
-function BaseRunner.get_target_spec(filename, line)
+function BaseRunner:get_target_spec(filename, line)
   _, _ = filename, line --- yeah, I hate warnings :)
   error('get_target_spec must be implemented by the runner')
 end

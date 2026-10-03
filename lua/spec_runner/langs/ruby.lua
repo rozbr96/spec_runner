@@ -1,15 +1,15 @@
+local BaseRunner = require('spec_runner.langs.base')
 
-local Base = require('spec_runner.langs.base')
+---@class RubyRunner: Runner
+local Ruby = setmetatable({
+  lang = 'ruby',
+  test_block_starters = { 'it ', 'context ', 'describe ', 'RSpec.describe ' }
+}, {
+  __index = BaseRunner
+})
 
-Ruby = {}
-
-function Ruby.get_current_cursor_spec_starting_line()
-  return Base.get_current_cursor_starting_line({'it ', 'context ', 'describe ', 'RSpec.describe '})
-end
-
-function Ruby.get_target_spec(filename, line)
+function Ruby:get_target_spec(filename, line)
   return filename .. ':' .. line
 end
 
 return Ruby
-

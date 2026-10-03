@@ -1,8 +1,14 @@
+local BaseRunner = require('spec_runner.langs.base')
 local utils = require('spec_runner.utils')
 
-Dart = {}
+---@class DartRunner: Runner
+local Dart = setmetatable({
+  lang = 'dart'
+}, {
+  __index = BaseRunner
+})
 
-function Dart.get_current_cursor_spec_starting_line()
+function Dart:get_current_cursor_spec_starting_line()
   local buf = vim.api.nvim_get_current_buf()
   local win = vim.api.nvim_get_current_win()
   local cursor = vim.api.nvim_win_get_cursor(win)
@@ -56,7 +62,7 @@ function Dart.get_current_cursor_spec_starting_line()
   return ''
 end
 
-function Dart.get_target_spec(filename, block_name_arg)
+function Dart:get_target_spec(filename, block_name_arg)
   return filename .. block_name_arg
 end
 
