@@ -4,14 +4,24 @@ local buffer = require('spec_runner.buffer')
 local langs = require('spec_runner.langs')
 local configs = require('spec_runner.configs')
 
+---Spawns command `command`
+---
+---@param command Runner.Command
 local function run(command)
   last_command = command
 
   last_buf, _ = buffer.open_output_buffer()
 
-  vim.fn.termopen(command.cmd .. " " .. table.concat(command.args or {}, " "))
+  vim.fn.jobstart(
+    vim.list_extend({ command.cmd }, command.args or {}),
+    { term = true }
+  )
 end
 
+---Builds command to indicate that specified language is unsupported
+---
+---@param filetype string The language which is not supported
+---@return Runner.Command
 local function unsupported_lang_command(filetype)
   if filetype == '' then
     filetype = 'Unknown language!'
@@ -26,6 +36,10 @@ end
 
 M = {}
 
+---Runs all specs for the current file
+---
+---@param only_failed_tests boolean? Indicates if only previous failed specs are to be tested
+---@param stop_at_first_failure boolean? Indicates if runner should stop at first failured
 function M.run_specs(only_failed_tests, stop_at_first_failure)
   local command
   local filetype = vim.bo.filetype
@@ -54,6 +68,7 @@ function M.run_specs(only_failed_tests, stop_at_first_failure)
   run(command)
 end
 
+---Runs the spec block within the current cursor position
 function M.run_current_spec()
   local command
   local file = vim.fn.expand('%')
@@ -70,24 +85,29 @@ function M.run_current_spec()
   run(command)
 end
 
+---Runs the last successfull spec command
 function M.run_last_command()
   if last_command then
     run(last_command)
   end
 end
 
+---Runs the previous failed specs
 function M.run_failed_specs()
   M.run_specs(true)
 end
 
+---Runs specs and stops at first failure
 function M.run_till_first_failure()
   M.run_specs(false, true)
 end
 
+---Runs previous failed specs and stops at first failure
 function M.run_failed_specs_till_first_failure()
   M.run_specs(true, true)
 end
 
+---Displays last command output
 function M.display_last_output()
   if last_buf and vim.api.nvim_buf_is_loaded(last_buf) then
     buffer.open_output_buffer(last_buf)
