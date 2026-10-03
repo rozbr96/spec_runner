@@ -1,6 +1,9 @@
-
 M = {}
 
+---Opens a floating window with the given buffer content
+---
+---@param buf number? Existing buffer id (if none is given, creates a new one)
+---@return number, number ids IDs for the buffer and window
 function M.open_output_buffer(buf)
   buf = buf or vim.api.nvim_create_buf(false, true)
 
@@ -23,4 +26,3 @@ function M.open_output_buffer(buf)
 end
 
 return M
-
