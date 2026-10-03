@@ -1,9 +1,15 @@
-
 local utils = require('spec_runner.utils')
 
-Base = {}
+---BaseRunner spec runner
+---@class Runner
+local BaseRunner = {}
 
-function Base.get_current_cursor_starting_line(test_block_starters)
+---Returns the starting line number for the current spec block
+---
+---If the cursor current position is not within a spec block, then first line reference is returned
+---@param test_block_starters string[] The prefix indications which represent spec blocks, like "`RSpec.describe`" or "`def test_`"
+---@return number
+function BaseRunner.get_current_cursor_starting_line(test_block_starters)
   local buffer = vim.api.nvim_get_current_buf()
   local window = vim.api.nvim_get_current_win()
   local cursor = vim.api.nvim_win_get_cursor(window)
@@ -38,4 +44,16 @@ function Base.get_current_cursor_starting_line(test_block_starters)
   return 1
 end
 
-return Base
+---MUST BE IMPLEMENTED BY THE RUNNER
+---
+---Builds the full targetted spec identification, along with path and line number
+---
+---@param filename string The targeted spec file
+---@param line string | number The targeted spec line number
+---@return string
+function BaseRunner.get_target_spec(filename, line)
+  _, _ = filename, line --- yeah, I hate warnings :)
+  error('get_target_spec must be implemented by the runner')
+end
+
+return BaseRunner
