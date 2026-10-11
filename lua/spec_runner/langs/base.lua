@@ -25,7 +25,7 @@ BaseRunner.test_block_starters = {}
 ---Returns the starting line number for the current spec block
 ---
 ---If the cursor current position is not within a spec block, then first line reference is returned
----@return number
+---@return number | string
 function BaseRunner:get_current_cursor_spec_starting_line()
   local buffer = vim.api.nvim_get_current_buf()
   local window = vim.api.nvim_get_current_win()
@@ -35,23 +35,13 @@ function BaseRunner:get_current_cursor_spec_starting_line()
   local first_code_line_tab_index = nil
   local start_line = cursor[1] - 1
 
-  while start_line > 0 do
+  while start_line >= 0 do
     local line_content = vim.api.nvim_buf_get_lines(buffer, start_line, start_line + 1, false)[1]
-    local stripped_line_content = utils.strip(line_content)
 
-    if first_code_line_tab_index == nil and line_content ~= '' then
-      first_code_line_tab_index = string.find(line_content, '%S')
-      first_code_line_tab_index = first_code_line_tab_index + (is_first_line and 1 or 0)
-    end
+    first_code_line_tab_index = self:tab_index(line_content, first_code_line_tab_index, is_first_line)
 
-    for index = 1, #self.test_block_starters do
-      if utils.starts_with(stripped_line_content, self.test_block_starters[index]) then
-        local current_line_tab_index = string.find(line_content, '%S')
-
-        if current_line_tab_index < first_code_line_tab_index then
-          return start_line + 1
-        end
-      end
+    if self:is_valid_starting_spec_block(line_content, first_code_line_tab_index) then
+      return start_line + 1
     end
 
     start_line = start_line - 1
@@ -59,6 +49,45 @@ function BaseRunner:get_current_cursor_spec_starting_line()
   end
 
   return 1
+end
+
+---Calculates line tab index
+---
+---@param line_content string The line content
+---@param first_code_line_tab_index number? The tab index for the previous processed line
+---@param is_first_line boolean? Indicates if `line_content` refers to the first line of the buffer
+---@return number | nil tab_index
+function BaseRunner:tab_index(line_content, first_code_line_tab_index, is_first_line)
+  if first_code_line_tab_index == nil and line_content ~= '' then
+    first_code_line_tab_index = string.find(line_content, '%S')
+
+    if first_code_line_tab_index ~= nil then
+      first_code_line_tab_index = first_code_line_tab_index + (is_first_line and 1 or 0)
+    end
+  end
+
+  return first_code_line_tab_index
+end
+
+---Checks if `line_content` is valid as starting block spec
+---
+---@param line_content string The line content to be checked for starting block spec
+---@param first_code_line_tab_index number? The tab index for the current cursor position
+---@return boolean is_valid
+function BaseRunner:is_valid_starting_spec_block(line_content, first_code_line_tab_index)
+  local stripped_line_content = utils.strip(line_content)
+
+  for index = 1, #self.test_block_starters do
+    if utils.starts_with(stripped_line_content, self.test_block_starters[index]) then
+      local current_line_tab_index = string.find(line_content, '%S')
+
+      if first_code_line_tab_index ~= nil and current_line_tab_index < first_code_line_tab_index then
+        return true
+      end
+    end
+  end
+
+  return false
 end
 
 ---Retrieves the spec command for the runner
