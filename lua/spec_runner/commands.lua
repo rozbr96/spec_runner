@@ -50,16 +50,12 @@ function M.run_specs(only_failed_tests, stop_at_first_failure)
 
     command = lang:get_spec_command()
 
-    if only_failed_tests then
-      if lang_configs.failed_specs_flag then
-        table.insert(command.args, lang_configs.failed_specs_flag)
-      end
+    if only_failed_tests and lang_configs.failed_specs_args then
+      vim.list_extend(command.args, lang_configs.failed_specs_args)
     end
 
-    if stop_at_first_failure then
-      if lang_configs.stop_at_first_failure_flag then
-        table.insert(command.args, lang_configs.stop_at_first_failure_flag)
-      end
+    if stop_at_first_failure and lang_configs.stop_at_first_failure_args then
+      vim.list_extend(command.args, lang_configs.stop_at_first_failure_args)
     end
   else
     command = unsupported_lang_command(filetype)

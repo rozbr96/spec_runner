@@ -13,13 +13,13 @@ M.config = {
   elixir = {
     cmd = 'mix',
     args = { 'test' },
-    failed_specs_flag = '--failed',
-    stop_at_first_failure_flag = '--max-failures 1'
+    failed_specs_args = { '--failed' },
+    stop_at_first_failure_args = { '--max-failures', '1' }
   },
   dart = {
     cmd = 'flutter',
     args = { 'test' },
-    stop_at_first_failure_flag = '--fail-fast'
+    stop_at_first_failure_args = { '--fail-fast' }
   }
 }
 
